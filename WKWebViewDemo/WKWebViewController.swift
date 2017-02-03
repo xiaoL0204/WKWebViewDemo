@@ -176,34 +176,38 @@ class WKWebViewController: BaseWebViewController,WKNavigationDelegate,WKUIDelega
         }else if message.name == FuncAddHotelLike {
             handlerAddHotelLikeAction((message.body as? String)!)
         }else if message.name == FuncClickPhoto {
-            if let dic = message.body as? NSDictionary {
-                guard let currImgUrl = dic["oc_imgUrl"] as? NSString else {return}
-                guard let imgBankArr = dic["oc_photoColl"] as? NSMutableArray else {return}
-                
-                var currImgInfo : WebPhotoImgInfo? = nil
-                let urlBankArr = NSMutableArray()
-                for i in 0 ..< imgBankArr.count  {
-                    let url = imgBankArr[i] as? NSString
-                    
-                    let tempInfo : WebPhotoImgInfo = WebPhotoImgInfo()
-                    tempInfo.imgUrl = url!
-                    if url == currImgUrl {
-                        currImgInfo = tempInfo
-                    }
-                    
-                    urlBankArr.add(tempInfo)
-                }
-                
-                
-                let vc : XLPhotoBrowserController = XLPhotoBrowserController()
-                vc.delegate = self
-                vc.setupUI(withCurrentImgAdapter: currImgInfo, imageAdaptersBank: NSArray(array:urlBankArr) as! [XLPhotoBrowserAdapterDelegate])
-                navigationController?.pushViewController(vc, animated: true)
+            if let dic = message.body as? Dictionary<String, Any> {
+                handlerClickImageTag(dic: dic)
             }
         }
     }
     
     
+    //点击image
+    func handlerClickImageTag(dic: Dictionary<String, Any>) {
+        guard let currImgUrl = dic["oc_imgUrl"] as? NSString else {return}
+        guard let imgBankArr = dic["oc_photoColl"] as? NSMutableArray else {return}
+        
+        var currImgInfo : WebPhotoImgInfo? = nil
+        let urlBankArr = NSMutableArray()
+        for i in 0 ..< imgBankArr.count  {
+            let url = imgBankArr[i] as? NSString
+            
+            let tempInfo : WebPhotoImgInfo = WebPhotoImgInfo()
+            tempInfo.imgUrl = url!
+            if url == currImgUrl {
+                currImgInfo = tempInfo
+            }
+            
+            urlBankArr.add(tempInfo)
+        }
+        
+        
+        let vc : XLPhotoBrowserController = XLPhotoBrowserController()
+        vc.delegate = self
+        vc.setupUI(withCurrentImgAdapter: currImgInfo, imageAdaptersBank: NSArray(array:urlBankArr) as! [XLPhotoBrowserAdapterDelegate])
+        navigationController?.pushViewController(vc, animated: true)
+    }
     
     
     //改变收藏状态
